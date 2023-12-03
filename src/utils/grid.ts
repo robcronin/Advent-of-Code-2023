@@ -33,8 +33,8 @@ export const diagonalDirections = [
 
 export class Grid<ValueType> {
   private gridMap: GridMap<ValueType>;
-  private numRows: number;
-  private numCols: number;
+  public numRows: number;
+  public numCols: number;
   private looping: boolean;
 
   public constructor(
