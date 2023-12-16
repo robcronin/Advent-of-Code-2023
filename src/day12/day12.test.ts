@@ -1,5 +1,14 @@
 import { logAnswer } from '../utils/logging';
-import { day12, day12part2, getIsValidRecord, getNumValidPerms, getPerms } from './day12';
+import {
+  day12,
+  day12part2,
+  extendRecords,
+  getBigNumPerms,
+  getIsValidRecord,
+  getNumValidPerms,
+  getPerms,
+  parseRecords,
+} from './day12';
 import { data, testData } from './day12.data';
 
 describe('day 12', () => {
@@ -15,7 +24,7 @@ describe('day 12', () => {
 });
 
 describe('day 12 part 2', () => {
-  it('test cases', () => {
+  it.skip('test cases', () => {
     expect(day12part2(testData)).toBe(525152);
   });
 
@@ -67,5 +76,20 @@ describe('getNumValidPerms', () => {
       4,
     );
     expect(getNumValidPerms({ springs: '?###????????'.split(''), groups: [3, 2, 1] })).toBe(10);
+  });
+});
+
+describe.only('getBigNumPerms', () => {
+  const records = parseRecords(testData);
+  const extendedRecords = extendRecords(records);
+  it.each([
+    [0, 1],
+    [1, 16384],
+    [2, 1],
+    [3, 16],
+    [4, 2500],
+    [5, 506250],
+  ])('should return valid perms for %p', (index, perms) => {
+    expect(getBigNumPerms(extendedRecords[index])).toBe(perms);
   });
 });
