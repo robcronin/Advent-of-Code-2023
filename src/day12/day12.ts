@@ -190,7 +190,7 @@ export const getBigNumPerms = (record: Record) => {
 
   let options: Option[] = [{ index: 0, numPerms: 1, groups: 0 }];
   for (let g = 0; g < groups.length; g++) {
-    console.log(' in g loop', options);
+    // console.log(' in g loop', options);
     const newOptions: Option[] = [];
     options.forEach((option) => {
       const shortSprings = springs.slice(option.index);

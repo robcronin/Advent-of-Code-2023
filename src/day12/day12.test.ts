@@ -90,6 +90,7 @@ describe.only('getBigNumPerms', () => {
     [4, 2500],
     [5, 506250],
   ])('should return valid perms for %p', (index, perms) => {
+    console.log(extendedRecords[index].springs.join(''), extendedRecords[index].groups);
     expect(getBigNumPerms(extendedRecords[index])).toBe(perms);
   });
 });
