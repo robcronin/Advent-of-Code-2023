@@ -14,6 +14,24 @@ const parseRecords = (input: string[]): Record[] =>
     return { springs: [...springs] as Spring[], groups: groups.split(',').map(Number) };
   });
 
+const extendRecords = (records: Record[]): Record[] =>
+  records.map((record) => {
+    const { springs, groups } = record;
+    const newGroups = [...groups, ...groups, ...groups, ...groups, ...groups];
+    const newSprings = [
+      ...springs,
+      Spring.UNKNOWN,
+      ...springs,
+      Spring.UNKNOWN,
+      ...springs,
+      Spring.UNKNOWN,
+      ...springs,
+      Spring.UNKNOWN,
+      ...springs,
+    ];
+    return { springs: newSprings, groups: newGroups };
+  });
+
 export const getIsValidRecord = (record: Record): boolean => {
   const { springs, groups } = record;
   if (springs.includes(Spring.UNKNOWN)) return false;
@@ -76,5 +94,9 @@ export const day12 = (input: string[]) => {
 };
 
 export const day12part2 = (input: string[]) => {
-  return 12;
+  const records = parseRecords(input);
+  const extendedRecords = extendRecords(records);
+  console.log(extendedRecords[1].springs.join(''), extendedRecords[1].groups);
+  // console.log(getNumValidPerms(extendedRecords[1]));
+  return sumArr(records, getNumValidPerms);
 };

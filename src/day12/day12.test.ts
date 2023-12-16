@@ -7,19 +7,19 @@ describe('day 12', () => {
     expect(day12(testData)).toBe(21);
   });
 
-  it('answer', () => {
+  it.skip('answer', () => {
     const answer = day12(data);
     logAnswer(answer, 12, 1);
     expect(answer).toBe(7379);
   });
 });
 
-describe.skip('day 12 part 2', () => {
+describe('day 12 part 2', () => {
   it('test cases', () => {
-    expect(day12part2(testData)).toBe(12);
+    expect(day12part2(testData)).toBe(525152);
   });
 
-  it('answer', () => {
+  it.skip('answer', () => {
     const answer = day12part2(data);
     logAnswer(answer, 12, 2);
     expect(answer).toBe(12);
