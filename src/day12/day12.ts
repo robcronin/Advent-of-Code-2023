@@ -191,11 +191,14 @@ export const getBigNumPerms = (record: Record) => {
 
   let options: Option[] = [{ index: 0, numPerms: 1, groups: 0 }];
   for (let g = 0; g < groups.length; g++) {
-    console.log(' in g loop', options);
+    // console.log(' in g loop', options);
 
     let numGroups = 1;
-    while (groups[g] === groups[g + numGroups]) numGroups++;
-    console.log({ numGroups });
+    while (groups[g + numGroups - 1] >= groups[g + numGroups]) numGroups++;
+    // console.log({ numGroups });
+    // if (groups[g] === 2 && groups[g + 1] === 1) numGroups = 2;
+
+    // console.log({ numGroups });
 
     const newOptions: Option[] = [];
     const shortGroups = groups.slice(g);
@@ -251,10 +254,15 @@ export const day12part2 = (input: string[]) => {
   const records = parseRecords(input);
   const extendedRecords = extendRecords(records);
   const num = 5;
-  console.log(extendedRecords[num].springs.join(''), extendedRecords[num].groups);
-  console.log(getBigNumPerms(extendedRecords[num]));
+  // console.log(extendedRecords[num].springs.join(''), extendedRecords[num].groups);
+  // console.log(getBigNumPerms(extendedRecords[num]));
   // console.log(getNumValidPerms(extendedRecords[1]));
-  // return sumArr(records, getNumValidPerms);
+  return sumArr(extendedRecords, (i) => {
+    console.log(i.springs.join(''), i.groups);
+    const ans = getBigNumPerms(i);
+    console.log(ans);
+    return ans;
+  });
 };
 
 // .??..??...?##.?.??..??...?##.?.??..??...?##.?.??..??...?##.?.??..??...?##.

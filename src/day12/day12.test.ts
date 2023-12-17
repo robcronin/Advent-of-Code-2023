@@ -26,11 +26,11 @@ describe('day 12', () => {
 });
 
 describe('day 12 part 2', () => {
-  it.skip('test cases', () => {
+  it.only('test cases', () => {
     expect(day12part2(testData)).toBe(525152);
   });
 
-  it.skip('answer', () => {
+  it.only('answer', () => {
     const answer = day12part2(data);
     logAnswer(answer, 12, 2);
     expect(answer).toBe(12);
@@ -69,6 +69,7 @@ describe('getPerms', () => {
 describe('getNumValidPerms', () => {
   it('should return the valid perms for a record', () => {
     expect(getNumValidPerms({ springs: '???.###'.split(''), groups: [1, 1, 3] })).toBe(1);
+    expect(getNumValidPerms({ springs: '????????'.split(''), groups: [2, 1] })).toBe(15);
     expect(getNumValidPerms({ springs: '.??..??...?##.'.split(''), groups: [1, 1, 3] })).toBe(4);
     expect(getNumValidPerms({ springs: '?#?#?#?#?#?#?#?'.split(''), groups: [1, 3, 1, 6] })).toBe(
       1,
@@ -90,7 +91,7 @@ describe('getNumValidPerms', () => {
 describe.only('getBigNumPerms', () => {
   const records = parseRecords(testData);
   const extendedRecords = extendRecords(records);
-  it.only('should handle the 8x case in big record', () => {
+  it('should handle the 8x case in big record', () => {
     expect(
       getBigNumPerms({
         springs: '?.??..??...?##'.split(''),
@@ -110,14 +111,14 @@ describe.only('getBigNumPerms', () => {
     [2, 1],
     [3, 16],
     [4, 2500],
-    [5, 506250],
+    [5, 506250], // 15^4 * 10
   ])('for example %p should return %p valid perms', (index, perms) => {
-    console.log(extendedRecords[index].springs.join(''), extendedRecords[index].groups);
+    // console.log(extendedRecords[index].springs.join(''), extendedRecords[index].groups);
     expect(getBigNumPerms(extendedRecords[index])).toBe(perms);
   });
 });
 
-describe.only('getBigNumPermOptions', () => {
+describe('getBigNumPermOptions', () => {
   it('should return an option', () => {
     expect(
       getBigNumPermOptions(
