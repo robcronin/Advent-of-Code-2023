@@ -76,20 +76,40 @@ describe('getNumValidPerms', () => {
       4,
     );
     expect(getNumValidPerms({ springs: '?###????????'.split(''), groups: [3, 2, 1] })).toBe(10);
+    expect(
+      getNumValidPerms({
+        springs: '.??..??...?##.?.??..??...?##'.split(''),
+        groups: [1, 1, 3, 1, 1, 3],
+      }),
+    ).toBe(32);
   });
 });
 
 describe.only('getBigNumPerms', () => {
   const records = parseRecords(testData);
   const extendedRecords = extendRecords(records);
+  it.only('should handle the 8x case in big record', () => {
+    expect(
+      getBigNumPerms({
+        springs: '?.??..??...?##'.split(''),
+        groups: [1, 1, 3],
+      }),
+    ).toBe(8);
+    // expect(
+    //   getBigNumPerms({
+    //     springs: '.??..??...?##.?.??..??...?##'.split(''),
+    //     groups: [1, 1, 3, 1, 1, 3],
+    //   }),
+    // ).toBe(32);
+  });
   it.each([
-    [0, 1],
+    // [0, 1],
     [1, 16384],
-    [2, 1],
-    [3, 16],
-    [4, 2500],
-    [5, 506250],
-  ])('should return valid perms for %p', (index, perms) => {
+    // [2, 1],
+    // [3, 16],
+    // [4, 2500],
+    // [5, 506250],
+  ])('for example %p should return %p valid perms', (index, perms) => {
     console.log(extendedRecords[index].springs.join(''), extendedRecords[index].groups);
     expect(getBigNumPerms(extendedRecords[index])).toBe(perms);
   });

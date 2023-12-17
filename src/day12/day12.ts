@@ -190,7 +190,7 @@ export const getBigNumPerms = (record: Record) => {
 
   let options: Option[] = [{ index: 0, numPerms: 1, groups: 0 }];
   for (let g = 0; g < groups.length; g++) {
-    // console.log(' in g loop', options);
+    console.log(' in g loop', options);
     const newOptions: Option[] = [];
     options.forEach((option) => {
       const shortSprings = springs.slice(option.index);
@@ -212,7 +212,7 @@ export const getBigNumPerms = (record: Record) => {
         newOptions.push({
           index: option.index + shortOption.index,
           numPerms: option.numPerms * shortOption.numPerms,
-          groups: g,
+          groups: g + 1,
         });
       });
     });
@@ -245,3 +245,5 @@ export const day12part2 = (input: string[]) => {
   // console.log(getNumValidPerms(extendedRecords[1]));
   // return sumArr(records, getNumValidPerms);
 };
+
+// .??..??...?##.?.??..??...?##.?.??..??...?##.?.??..??...?##.?.??..??...?##.
