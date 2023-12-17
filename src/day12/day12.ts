@@ -193,8 +193,9 @@ export const getBigNumPerms = (record: Record) => {
   for (let g = 0; g < groups.length; g++) {
     console.log(' in g loop', options);
 
-    // let numGroups = 1;
-    // while(groups[g] === groups[g+1])numGroups++
+    let numGroups = 1;
+    while (groups[g] === groups[g + numGroups]) numGroups++;
+    console.log({ numGroups });
 
     const newOptions: Option[] = [];
     const shortGroups = groups.slice(g);
@@ -206,11 +207,11 @@ export const getBigNumPerms = (record: Record) => {
       //   'with',
       //   shortSprings,
       //   shortGroups,
-      //   Math.min(2, shortGroups.length),
+      //   numGroups,
       // );
       const shortOptions = getBigNumPermOptions(
         { springs: shortSprings, groups: shortGroups },
-        Math.min(2, shortGroups.length),
+        numGroups,
       );
       // console.log('in option loop', {
       //   g,
@@ -233,7 +234,7 @@ export const getBigNumPerms = (record: Record) => {
       }
       return [...acc, newOption];
     }, []);
-    if (Math.min(2, shortGroups.length) === 2) g++;
+    g += numGroups - 1;
     // options = newOptions;
   }
   // console.log({ options });

@@ -105,12 +105,12 @@ describe.only('getBigNumPerms', () => {
     // ).toBe(32);
   });
   it.only.each([
-    // [0, 1],
+    [0, 1],
     [1, 16384],
-    // [2, 1],
-    // [3, 16],
-    // [4, 2500],
-    // [5, 506250],
+    [2, 1],
+    [3, 16],
+    [4, 2500],
+    [5, 506250],
   ])('for example %p should return %p valid perms', (index, perms) => {
     console.log(extendedRecords[index].springs.join(''), extendedRecords[index].groups);
     expect(getBigNumPerms(extendedRecords[index])).toBe(perms);
