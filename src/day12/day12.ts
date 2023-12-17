@@ -291,6 +291,21 @@ export const getRecNumPerms = (record: SRecord, memo: Record<string, number> = {
     return 0;
   }
 
+  ///////
+  const numDamage = record.springs.filter((i) => i === Spring.DAMAGED).length;
+  const numOp = record.springs.filter((i) => i === Spring.OPERATIONAL).length;
+  const numUnknown = record.springs.filter((i) => i === Spring.UNKNOWN).length;
+  const reqDamage = sumArr(record.groups, (i) => i);
+  const reqOp = record.groups.length - 1;
+  if (reqDamage > numDamage + numUnknown || reqOp > numOp + numUnknown) {
+    // console.log('extra hit');
+    // console.log({ numDamage, numOp, numUnknown, reqDamage, reqOp });
+    memo[memoKey] = 0;
+    return 0;
+  }
+
+  ///////
+
   const remainingGroups = record.groups.slice(currentGroups.length);
   const nextUnknown = record.springs.findIndex((spring) => spring === Spring.UNKNOWN);
   if (nextUnknown === -1) {
@@ -324,11 +339,12 @@ export const day12part2 = (input: string[]) => {
   const extendedRecords = extendRecords(records);
 
   let sum = 0;
-  for (let i = 0; i < extendedRecords.length; i++) {
-    // if (i > 28) printRecord(extendedRecords[i]);
+  let start = extendedRecords.length > 10 ? 161 : 0;
+  for (let i = start; i < extendedRecords.length; i++) {
+    if (i > 28) printRecord(extendedRecords[i]);
     const ans = getRecNumPerms(extendedRecords[i], {});
     sum += ans;
-    // console.log(i, ans);
+    console.log(i, ans);
   }
   return sum;
   // const num = 5;
