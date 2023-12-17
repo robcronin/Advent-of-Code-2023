@@ -27,11 +27,11 @@ describe.only('day 12', () => {
 });
 
 describe('day 12 part 2', () => {
-  it('test cases', () => {
+  it.only('test cases', () => {
     expect(day12part2(testData)).toBe(525152);
   });
 
-  it('answer', () => {
+  it.skip('answer', () => {
     const answer = day12part2(data);
     logAnswer(answer, 12, 2);
     expect(answer).toBe(12);

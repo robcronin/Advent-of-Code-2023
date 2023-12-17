@@ -6,21 +6,21 @@ export enum Spring {
   DAMAGED = '#',
   UNKNOWN = '?',
 }
-type Record = { springs: Spring[]; groups: number[] };
+type SRecord = { springs: Spring[]; groups: number[] };
 type Option = { index: number; numPerms: number };
 
-export const parseRecords = (input: string[]): Record[] =>
+export const parseRecords = (input: string[]): SRecord[] =>
   input.map((line) => {
     const [springs, groups] = line.split(' ');
     return { springs: [...springs] as Spring[], groups: groups.split(',').map(Number) };
   });
 
-const printRecord = (record: Record, info?: string) => {
-  return;
+const printRecord = (record: SRecord, info?: string) => {
+  // return;
   console.log(info || '', record.springs.join(''), ' : ', record.groups);
 };
 
-export const extendRecords = (records: Record[]): Record[] =>
+export const extendRecords = (records: SRecord[]): SRecord[] =>
   records.map((record) => {
     const { springs, groups } = record;
     const newGroups = [...groups, ...groups, ...groups, ...groups, ...groups];
@@ -38,7 +38,7 @@ export const extendRecords = (records: Record[]): Record[] =>
     return { springs: newSprings, groups: newGroups };
   });
 
-export const getIsValidRecord = (record: Record): boolean => {
+export const getIsValidRecord = (record: SRecord): boolean => {
   const { springs, groups } = record;
   if (springs.includes(Spring.UNKNOWN)) return false;
   const actualGroups: number[] = [];
@@ -59,7 +59,7 @@ export const getIsValidRecord = (record: Record): boolean => {
   );
 };
 
-export const getIsValidStartRecord = (record: Record, numToCheck: number): boolean => {
+export const getIsValidStartRecord = (record: SRecord, numToCheck: number): boolean => {
   const { springs, groups } = record;
   const actualGroups: number[] = [];
   let groupSize = 0;
@@ -80,7 +80,7 @@ export const getIsValidStartRecord = (record: Record, numToCheck: number): boole
   );
 };
 
-export const getFirstGroupSize = (record: Record): number => {
+export const getFirstGroupSize = (record: SRecord): number => {
   const { springs, groups } = record;
   let groupSize = 0;
   for (let i = 0; i < springs.length; i++) {
@@ -93,7 +93,7 @@ export const getFirstGroupSize = (record: Record): number => {
   return groupSize;
 };
 
-export const getGroupSizePossible = (record: Record, num: number): number => {
+export const getGroupSizePossible = (record: SRecord, num: number): number => {
   const { springs, groups } = record;
   let groupSize = 0;
   for (let i = 0; i < springs.length; i++) {
@@ -124,7 +124,7 @@ export const getPerms = (num: number, requiredNumDamaged?: number) => {
   return perms;
 };
 
-export const getNumValidPerms = (record: Record): number => {
+export const getNumValidPerms = (record: SRecord): number => {
   const { springs, groups } = record;
   const unknowns = springs
     .map((spring, index) => spring === Spring.UNKNOWN && index)
@@ -144,7 +144,7 @@ export const getNumValidPerms = (record: Record): number => {
   return validPerms.length;
 };
 
-export const getBigNumPermOptions = (record: Record, numGroups: number): Option[] => {
+export const getBigNumPermOptions = (record: SRecord, numGroups: number): Option[] => {
   // console.log('getBigNumPermOptions', record, numGroups);
   const { springs, groups } = record;
   // console.log(springs.join(''));
@@ -191,7 +191,7 @@ export const getBigNumPermOptions = (record: Record, numGroups: number): Option[
   return options;
 };
 
-export const getBigNumPerms = (record: Record) => {
+export const getBigNumPerms = (record: SRecord) => {
   const { springs, groups } = record;
 
   let options: Option[] = [{ index: 0, numPerms: 1, groups: 0 }];
@@ -269,52 +269,78 @@ const getCurrentGroups = (springs: Spring[]): { groups: number[]; end: number } 
   return { groups, end };
 };
 
-export const getRecNumPerms = (record: Record): number => {
-  printRecord(record, 'start getRecNumPerms');
-  const isValid = getIsValidRecord(record);
-  if (isValid) return 1;
+const getMemoKey = (record: SRecord) => `${record.springs.join('')} : ${record.groups.join(',')}`;
+
+export const getRecNumPerms = (record: SRecord, memo: Record<string, number> = {}): number => {
+  const memoKey = getMemoKey(record);
+  if (memo[memoKey]) return memo[memoKey];
 
   const { groups: currentGroups, end } = getCurrentGroups(record.springs);
   const isStartValid = currentGroups.every((group, i) => group === record.groups[i]);
-  if (!isStartValid) return 0;
+  if (!isStartValid) {
+    memo[memoKey] = 0;
+    return 0;
+  }
+  if (currentGroups.length === record.groups.length && !record.springs.includes(Spring.UNKNOWN)) {
+    memo[memoKey] = 1;
+    return 1;
+  }
+
+  if (record.springs.length < sumArr(record.groups, (i) => i) + record.groups.length - 1) {
+    memo[memoKey] = 0;
+    return 0;
+  }
 
   const remainingGroups = record.groups.slice(currentGroups.length);
   const nextUnknown = record.springs.findIndex((spring) => spring === Spring.UNKNOWN);
-  if (nextUnknown === -1) return 0;
+  if (nextUnknown === -1) {
+    memo[memoKey] = 0;
+    return 0;
+  }
 
   const damageOption = [...record.springs];
   damageOption[nextUnknown] = Spring.DAMAGED;
   const damageRecord = { springs: damageOption.slice(end), groups: remainingGroups };
-  printRecord(damageRecord, 'damageRecord');
-  const damagedPerms = getRecNumPerms(damageRecord);
+  // printRecord(damageRecord, 'damageRecord');
+  const damagedPerms = getRecNumPerms(damageRecord, memo);
 
   const operationalOption = [...record.springs];
   operationalOption[nextUnknown] = Spring.OPERATIONAL;
   const operationalRecord = { springs: operationalOption.slice(end), groups: remainingGroups };
-  printRecord(operationalRecord, 'operationalRecord');
-  const operationalPerms = getRecNumPerms(operationalRecord);
+  // printRecord(operationalRecord, 'operationalRecord');
+  const operationalPerms = getRecNumPerms(operationalRecord, memo);
 
+  memo[memoKey] = damagedPerms + operationalPerms;
   return damagedPerms + operationalPerms;
 };
 
 export const day12 = (input: string[]) => {
   const records = parseRecords(input);
-  return sumArr(records, getNumValidPerms);
+  return sumArr(records, (i) => getRecNumPerms(i, {}));
 };
 
 export const day12part2 = (input: string[]) => {
   const records = parseRecords(input);
   const extendedRecords = extendRecords(records);
-  const num = 5;
-  // console.log(extendedRecords[num].springs.join(''), extendedRecords[num].groups);
-  // console.log(getBigNumPerms(extendedRecords[num]));
-  // console.log(getNumValidPerms(extendedRecords[1]));
-  return sumArr(extendedRecords, (i) => {
-    console.log(i.springs.join(''), i.groups);
-    const ans = getBigNumPerms(i);
-    console.log(ans);
-    return ans;
-  });
+
+  let sum = 0;
+  for (let i = 0; i < extendedRecords.length; i++) {
+    // if (i > 28) printRecord(extendedRecords[i]);
+    const ans = getRecNumPerms(extendedRecords[i], {});
+    sum += ans;
+    // console.log(i, ans);
+  }
+  return sum;
+  // const num = 5;
+  // // console.log(extendedRecords[num].springs.join(''), extendedRecords[num].groups);
+  // // console.log(getBigNumPerms(extendedRecords[num]));
+  // // console.log(getNumValidPerms(extendedRecords[1]));
+  // return sumArr(extendedRecords, (i) => {
+  //   // console.log(i.springs.join(''), i.groups);
+  //   const ans = getRecNumPerms(i, {});
+  //   console.log(ans);
+  //   return ans;
+  // });
 };
 
 // .??..??...?##.?.??..??...?##.?.??..??...?##.?.??..??...?##.?.??..??...?##.
