@@ -34,7 +34,7 @@ describe('day 12 part 2', () => {
   it.only('answer', () => {
     const answer = day12part2(data);
     logAnswer(answer, 12, 2);
-    expect(answer).toBe(12);
+    expect(answer).toBe(7732028747925);
   });
 });
 

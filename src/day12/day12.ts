@@ -271,23 +271,23 @@ const getCurrentGroups = (springs: Spring[]): { groups: number[]; end: number } 
 
 const getMemoKey = (record: SRecord) => `${record.springs.join('')} : ${record.groups.join(',')}`;
 
-export const getRecNumPerms = (record: SRecord, memo: Record<string, number> = {}): number => {
+export const getRecNumPerms = (record: SRecord, memo: Map<string, number> = new Map()): number => {
   const memoKey = getMemoKey(record);
-  if (memo[memoKey]) return memo[memoKey];
+  if (memo.has(memoKey)) return memo.get(memoKey);
 
   const { groups: currentGroups, end } = getCurrentGroups(record.springs);
   const isStartValid = currentGroups.every((group, i) => group === record.groups[i]);
   if (!isStartValid) {
-    memo[memoKey] = 0;
+    memo.set(memoKey, 0);
     return 0;
   }
   if (currentGroups.length === record.groups.length && !record.springs.includes(Spring.UNKNOWN)) {
-    memo[memoKey] = 1;
+    memo.set(memoKey, 1);
     return 1;
   }
 
   if (record.springs.length < sumArr(record.groups, (i) => i) + record.groups.length - 1) {
-    memo[memoKey] = 0;
+    memo.set(memoKey, 0);
     return 0;
   }
 
@@ -300,7 +300,7 @@ export const getRecNumPerms = (record: SRecord, memo: Record<string, number> = {
   if (reqDamage > numDamage + numUnknown || reqOp > numOp + numUnknown) {
     // console.log('extra hit');
     // console.log({ numDamage, numOp, numUnknown, reqDamage, reqOp });
-    memo[memoKey] = 0;
+    memo.set(memoKey, 0);
     return 0;
   }
 
@@ -309,7 +309,7 @@ export const getRecNumPerms = (record: SRecord, memo: Record<string, number> = {
   const remainingGroups = record.groups.slice(currentGroups.length);
   const nextUnknown = record.springs.findIndex((spring) => spring === Spring.UNKNOWN);
   if (nextUnknown === -1) {
-    memo[memoKey] = 0;
+    memo.set(memoKey, 0);
     return 0;
   }
 
@@ -325,13 +325,13 @@ export const getRecNumPerms = (record: SRecord, memo: Record<string, number> = {
   // printRecord(operationalRecord, 'operationalRecord');
   const operationalPerms = getRecNumPerms(operationalRecord, memo);
 
-  memo[memoKey] = damagedPerms + operationalPerms;
+  memo.set(memoKey, damagedPerms + operationalPerms);
   return damagedPerms + operationalPerms;
 };
 
 export const day12 = (input: string[]) => {
   const records = parseRecords(input);
-  return sumArr(records, (i) => getRecNumPerms(i, {}));
+  return sumArr(records, (i) => getRecNumPerms(i, new Map()));
 };
 
 export const day12part2 = (input: string[]) => {
@@ -339,10 +339,10 @@ export const day12part2 = (input: string[]) => {
   const extendedRecords = extendRecords(records);
 
   let sum = 0;
-  let start = extendedRecords.length > 10 ? 161 : 0;
+  let start = 0; //extendedRecords.length > 10 ? 161 : 0;
   for (let i = start; i < extendedRecords.length; i++) {
-    if (i > 28) printRecord(extendedRecords[i]);
-    const ans = getRecNumPerms(extendedRecords[i], {});
+    // if (i > 28) printRecord(extendedRecords[i]);
+    const ans = getRecNumPerms(extendedRecords[i], new Map());
     sum += ans;
     console.log(i, ans);
   }
