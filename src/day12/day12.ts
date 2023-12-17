@@ -15,6 +15,11 @@ export const parseRecords = (input: string[]): Record[] =>
     return { springs: [...springs] as Spring[], groups: groups.split(',').map(Number) };
   });
 
+const printRecord = (record: Record, info?: string) => {
+  return;
+  console.log(info || '', record.springs.join(''), ' : ', record.groups);
+};
+
 export const extendRecords = (records: Record[]): Record[] =>
   records.map((record) => {
     const { springs, groups } = record;
@@ -243,6 +248,53 @@ export const getBigNumPerms = (record: Record) => {
   // console.log({ options });
   return maxArr(options, (option) => option.numPerms);
   // return sumArr(options, (option) => option.numPerms);
+};
+
+const getCurrentGroups = (springs: Spring[]): { groups: number[]; end: number } => {
+  const groups: number[] = [];
+
+  let groupSize = 0;
+  let end = 0;
+  for (let i = 0; i < springs.length; i++) {
+    const spring = springs[i];
+    if (spring === Spring.UNKNOWN) return { groups, end };
+    if (spring === Spring.DAMAGED) groupSize++;
+    else if (groupSize > 0) {
+      groups.push(groupSize);
+      groupSize = 0;
+      end = i;
+    }
+  }
+  if (groupSize > 0) groups.push(groupSize);
+  return { groups, end };
+};
+
+export const getRecNumPerms = (record: Record): number => {
+  printRecord(record, 'start getRecNumPerms');
+  const isValid = getIsValidRecord(record);
+  if (isValid) return 1;
+
+  const { groups: currentGroups, end } = getCurrentGroups(record.springs);
+  const isStartValid = currentGroups.every((group, i) => group === record.groups[i]);
+  if (!isStartValid) return 0;
+
+  const remainingGroups = record.groups.slice(currentGroups.length);
+  const nextUnknown = record.springs.findIndex((spring) => spring === Spring.UNKNOWN);
+  if (nextUnknown === -1) return 0;
+
+  const damageOption = [...record.springs];
+  damageOption[nextUnknown] = Spring.DAMAGED;
+  const damageRecord = { springs: damageOption.slice(end), groups: remainingGroups };
+  printRecord(damageRecord, 'damageRecord');
+  const damagedPerms = getRecNumPerms(damageRecord);
+
+  const operationalOption = [...record.springs];
+  operationalOption[nextUnknown] = Spring.OPERATIONAL;
+  const operationalRecord = { springs: operationalOption.slice(end), groups: remainingGroups };
+  printRecord(operationalRecord, 'operationalRecord');
+  const operationalPerms = getRecNumPerms(operationalRecord);
+
+  return damagedPerms + operationalPerms;
 };
 
 export const day12 = (input: string[]) => {

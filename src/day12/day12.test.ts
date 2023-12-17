@@ -9,16 +9,17 @@ import {
   getIsValidRecord,
   getNumValidPerms,
   getPerms,
+  getRecNumPerms,
   parseRecords,
 } from './day12';
 import { data, testData } from './day12.data';
 
-describe('day 12', () => {
+describe.only('day 12', () => {
   it('test cases', () => {
     expect(day12(testData)).toBe(21);
   });
 
-  it.skip('answer', () => {
+  it('answer', () => {
     const answer = day12(data);
     logAnswer(answer, 12, 1);
     expect(answer).toBe(7379);
@@ -26,11 +27,11 @@ describe('day 12', () => {
 });
 
 describe('day 12 part 2', () => {
-  it.only('test cases', () => {
+  it('test cases', () => {
     expect(day12part2(testData)).toBe(525152);
   });
 
-  it.only('answer', () => {
+  it('answer', () => {
     const answer = day12part2(data);
     logAnswer(answer, 12, 2);
     expect(answer).toBe(12);
@@ -88,7 +89,25 @@ describe('getNumValidPerms', () => {
   });
 });
 
-describe.only('getBigNumPerms', () => {
+describe.only('getRecNumPerms', () => {
+  it('should return the valid perms for a record', () => {
+    expect(getRecNumPerms({ springs: '???.###'.split(''), groups: [1, 1, 3] })).toBe(1);
+    expect(getRecNumPerms({ springs: '????????'.split(''), groups: [2, 1] })).toBe(15);
+    expect(getRecNumPerms({ springs: '.??..??...?##.'.split(''), groups: [1, 1, 3] })).toBe(4);
+    expect(getRecNumPerms({ springs: '?#?#?#?#?#?#?#?'.split(''), groups: [1, 3, 1, 6] })).toBe(1);
+    expect(getRecNumPerms({ springs: '????.#...#...'.split(''), groups: [4, 1, 1] })).toBe(1);
+    expect(getRecNumPerms({ springs: '????.######..#####.'.split(''), groups: [1, 6, 5] })).toBe(4);
+    expect(getRecNumPerms({ springs: '?###????????'.split(''), groups: [3, 2, 1] })).toBe(10);
+    expect(
+      getRecNumPerms({
+        springs: '.??..??...?##.?.??..??...?##'.split(''),
+        groups: [1, 1, 3, 1, 1, 3],
+      }),
+    ).toBe(32);
+  });
+});
+
+describe('getBigNumPerms', () => {
   const records = parseRecords(testData);
   const extendedRecords = extendRecords(records);
   it('should handle the 8x case in big record', () => {
@@ -105,7 +124,7 @@ describe.only('getBigNumPerms', () => {
     //   }),
     // ).toBe(32);
   });
-  it.only.each([
+  it.each([
     [0, 1],
     [1, 16384],
     [2, 1],
