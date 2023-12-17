@@ -1,8 +1,10 @@
 import { logAnswer } from '../utils/logging';
 import {
+  Spring,
   day12,
   day12part2,
   extendRecords,
+  getBigNumPermOptions,
   getBigNumPerms,
   getIsValidRecord,
   getNumValidPerms,
@@ -102,7 +104,7 @@ describe.only('getBigNumPerms', () => {
     //   }),
     // ).toBe(32);
   });
-  it.each([
+  it.only.each([
     // [0, 1],
     [1, 16384],
     // [2, 1],
@@ -112,5 +114,19 @@ describe.only('getBigNumPerms', () => {
   ])('for example %p should return %p valid perms', (index, perms) => {
     console.log(extendedRecords[index].springs.join(''), extendedRecords[index].groups);
     expect(getBigNumPerms(extendedRecords[index])).toBe(perms);
+  });
+});
+
+describe.only('getBigNumPermOptions', () => {
+  it('should return an option', () => {
+    expect(
+      getBigNumPermOptions(
+        { springs: ['.', '.', '?', '?', '.', '.', '.', '?', '#', '#'] as Spring[], groups: [1, 3] },
+        2,
+      ),
+    ).toEqual([
+      { index: 10, numPerms: 2 },
+      { index: 11, numPerms: 2 },
+    ]);
   });
 });

@@ -1,7 +1,7 @@
 import { maxArr, sumArr } from '../utils/array';
 import { range } from '../utils/looping';
 
-enum Spring {
+export enum Spring {
   OPERATIONAL = '.',
   DAMAGED = '#',
   UNKNOWN = '?',
@@ -139,14 +139,15 @@ export const getNumValidPerms = (record: Record): number => {
   return validPerms.length;
 };
 
-const getBigNumPermOptions = (record: Record, numGroups: number): Option[] => {
+export const getBigNumPermOptions = (record: Record, numGroups: number): Option[] => {
   // console.log('getBigNumPermOptions', record, numGroups);
   const { springs, groups } = record;
+  // console.log(springs.join(''));
 
   const options: Option[] = [];
   let length = 1;
 
-  const requiredSizeLeft = sumArr(record.groups.slice(1), (group) => group + 1) - 1;
+  const requiredSizeLeft = sumArr(record.groups.slice(numGroups), (group) => group + 1) - 1;
   const firstGroupSize = getFirstGroupSize(record);
   // if (firstGroupSize > groups[0]) return options;
   while (true) {
@@ -191,18 +192,26 @@ export const getBigNumPerms = (record: Record) => {
   let options: Option[] = [{ index: 0, numPerms: 1, groups: 0 }];
   for (let g = 0; g < groups.length; g++) {
     console.log(' in g loop', options);
+
+    // let numGroups = 1;
+    // while(groups[g] === groups[g+1])numGroups++
+
     const newOptions: Option[] = [];
+    const shortGroups = groups.slice(g);
     options.forEach((option) => {
       const shortSprings = springs.slice(option.index);
-      const shortGroups = groups.slice(g);
       // console.log(
       //   'about to call getBigNumPermOptions for',
       //   option,
       //   'with',
       //   shortSprings,
       //   shortGroups,
+      //   Math.min(2, shortGroups.length),
       // );
-      const shortOptions = getBigNumPermOptions({ springs: shortSprings, groups: shortGroups }, 1);
+      const shortOptions = getBigNumPermOptions(
+        { springs: shortSprings, groups: shortGroups },
+        Math.min(2, shortGroups.length),
+      );
       // console.log('in option loop', {
       //   g,
       //   shortOptions,
@@ -224,9 +233,10 @@ export const getBigNumPerms = (record: Record) => {
       }
       return [...acc, newOption];
     }, []);
+    if (Math.min(2, shortGroups.length) === 2) g++;
     // options = newOptions;
   }
-  console.log({ options });
+  // console.log({ options });
   return maxArr(options, (option) => option.numPerms);
   // return sumArr(options, (option) => option.numPerms);
 };
