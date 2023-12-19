@@ -8,20 +8,32 @@ enum Value {
 }
 type Platform = Grid<Value>;
 
-const directions = [[1, 0]];
+enum Direction {
+  NORTH = 0,
+  EAST = 1,
+  SOUTH = 2,
+  WEST = 3,
+}
 
-const tiltPlatform = (platform: Platform, isSouth?: boolean) => {
-  const direction = directions[0];
-  range(platform.numRows).forEach((r) => {
-    range(platform.numCols).forEach((c) => {
-      const x = isSouth ? platform.numRows - r - 1 : r;
-      if (platform.get({ x, y: c }) === Value.ROUND) {
-        const mult = isSouth ? -1 : 1;
-        let offset = mult * 1;
-        while (platform.get({ x: x - offset, y: c }) === Value.EMPTY) {
-          platform.set({ x: x - offset, y: c }, Value.ROUND);
-          platform.set({ x: x - offset + mult * 1, y: c }, Value.EMPTY);
-          offset += mult * 1;
+const directions = [
+  [1, 0], // n
+  [0, -1], // e
+  [-1, 0], // s
+  [0, 1], // w
+];
+
+const tiltPlatform = (platform: Platform, direction: Direction) => {
+  const [dx, dy] = directions[direction];
+  range(platform.numCols).forEach((c) => {
+    range(platform.numRows).forEach((r) => {
+      const x = dx < 0 ? platform.numRows - r - 1 : r;
+      const y = dy < 0 ? platform.numCols - c - 1 : c;
+      if (platform.get({ x, y }) === Value.ROUND) {
+        let offset = [dx, dy];
+        while (platform.get({ x: x - offset[0], y: y - offset[1] }) === Value.EMPTY) {
+          platform.set({ x: x - offset[0], y: y - offset[1] }, Value.ROUND);
+          platform.set({ x: x - offset[0] + dx, y: y - offset[1] + dy }, Value.EMPTY);
+          offset = [offset[0] + dx, offset[1] + dy];
         }
       }
     });
@@ -43,13 +55,7 @@ const getLoad = (platform: Platform): number => {
 export const day14 = (input: string[]) => {
   const platform = createGridFromInput(input) as Platform;
   platform.print();
-  tiltPlatform(platform);
-  platform.print();
-  tiltPlatform(platform, true);
-  platform.print();
-  tiltPlatform(platform, true);
-  platform.print();
-  tiltPlatform(platform);
+  tiltPlatform(platform, Direction.EAST);
   platform.print();
 
   return getLoad(platform);
