@@ -3,7 +3,7 @@ import { day14, day14part2 } from './day14';
 import { data, testData } from './day14.data';
 
 describe.only('day 14', () => {
-  it('test cases', () => {
+  it.only('test cases', () => {
     expect(day14(testData)).toBe(136);
   });
 
