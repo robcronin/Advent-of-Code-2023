@@ -19,7 +19,7 @@ describe('day 14 part 2', () => {
     expect(day14part2(testData)).toBe(64);
   });
 
-  it.skip('answer', () => {
+  it('answer', () => {
     const answer = day14part2(data);
     logAnswer(answer, 14, 2);
     expect(answer).toBe(99118);

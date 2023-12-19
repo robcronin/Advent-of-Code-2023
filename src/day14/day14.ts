@@ -52,18 +52,22 @@ const getLoad = (platform: Platform): number => {
   return load;
 };
 
-const tiltCycle = (platform: Platform, numCycles: number, print?: boolean) => {
-  const prints = [];
+const tiltCycle = (platform: Platform, numCycles: number, getCycles?: boolean) => {
+  const cycles = [];
   for (let i = 0; i < numCycles; i++) {
-    if (i % 10000 === 0) console.log(i, i / numCycles);
     tiltPlatform(platform, Direction.NORTH);
     tiltPlatform(platform, Direction.WEST);
     tiltPlatform(platform, Direction.SOUTH);
     tiltPlatform(platform, Direction.EAST);
-    if (print) prints.push(getLoad(platform));
+    if (getCycles) cycles.push(getLoad(platform));
   }
-  if (print) console.log(prints);
+  return cycles;
 };
+
+const getLoopSize = (cycles: number[]): number | undefined =>
+  range(2, cycles.length / 2).find((loopSize) =>
+    range(loopSize).every((i) => cycles[i] === cycles[i + loopSize]),
+  );
 
 export const day14 = (input: string[]) => {
   const platform = createGridFromInput(input) as Platform;
@@ -73,33 +77,9 @@ export const day14 = (input: string[]) => {
 
 export const day14part2 = (input: string[]) => {
   const platform = createGridFromInput(input) as Platform;
-  tiltCycle(platform, 10000);
-  tiltCycle(platform, 100, true);
-  // platform.print();
-  const a1 = [
-    65, 64, 65, 63, 68, 69, 69, 65, 64, 65, 63, 68, 69, 69, 65, 64, 65, 63, 68, 69, 69, 65, 64, 65,
-    63, 68, 69, 69, 65, 64, 65, 63, 68, 69, 69, 65, 64, 65, 63, 68, 69, 69, 65, 64, 65, 63, 68, 69,
-    69, 65, 64, 65, 63, 68, 69, 69, 65, 64, 65, 63, 68, 69, 69, 65, 64, 65, 63, 68, 69, 69, 65, 64,
-    65, 63, 68, 69, 69, 65, 64, 65, 63, 68, 69, 69, 65, 64, 65, 63, 68, 69, 69, 65, 64, 65, 63, 68,
-    69, 69, 65, 64,
-  ];
-  const a = [
-    99135, 99165, 99179, 99158, 99097, 99106, 99121, 99103, 99131, 99150, 99181, 99163, 99132,
-    99102, 99115, 99105, 99116, 99146, 99166, 99165, 99137, 99137, 99111, 99099, 99118, 99131,
-    99162, 99150, 99139, 99142, 99146, 99095, 99112, 99133, 99147, 99146, 99124, 99144, 99151,
-    99130, 99108, 99127, 99149, 99131, 99120, 99129, 99153, 99135, 99143, 99123, 99143, 99133,
-    99105, 99125, 99138, 99137, 99148, 99158, 99139, 99127, 99107, 99110, 99134, 99122, 99150,
-    99163, 99174, 99123, 99101, 99112, 99119, 99118, 99135, 99165, 99179, 99158, 99097, 99106,
-    99121, 99103, 99131, 99150, 99181, 99163, 99132, 99102, 99115, 99105, 99116, 99146, 99166,
-    99165, 99137, 99137, 99111, 99099, 99118, 99131, 99162, 99150,
-  ];
-  const b1 = (1000000000 - 10001) % 7;
-  const b = (1000000000 - 10001) % 72;
-  console.log(a1[b1], a[b]);
-  return a[b];
-  const index = a.findIndex((i) => i === 99135);
-  console.log({ index });
-  return getLoad(platform);
+  tiltCycle(platform, 100);
+  const cycles = tiltCycle(platform, 200, true);
+  const loopSize = getLoopSize(cycles);
+  if (!loopSize) throw new Error('No loop size found');
+  return cycles[(1000000000 - 101) % loopSize];
 };
-
-// 99129 - too high
