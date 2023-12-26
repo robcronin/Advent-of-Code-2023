@@ -8,10 +8,14 @@
 import { Coords } from './grid';
 import { range } from './looping';
 
-export type ExpandingGrid<ValueType> = Record<
-  number,
-  Record<number, ValueType>
->;
+export type ExpandingGrid<ValueType> = Record<number, Record<number, ValueType>>;
+
+export type Dimensions = {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+};
 
 export const directions = [
   [0, 1],
@@ -39,10 +43,7 @@ export const genNewExpandingGrid = <ValueType>({
   return expandingGrid;
 };
 
-export const getValueExpandingGrid = <ValueType>(
-  expandingGrid: ExpandingGrid<ValueType>,
-  { x, y }: Coords,
-) => {
+export const getValueExpandingGrid = <ValueType>(expandingGrid: ExpandingGrid<ValueType>, { x, y }: Coords) => {
   if (expandingGrid[x]) return expandingGrid[x][y];
   return undefined;
 };
@@ -56,9 +57,7 @@ export const setValueExpandingGrid = <ValueType>(
   else expandingGrid[x] = { [y]: value };
 };
 
-export const deepCopyExpandingGrid = <ValueType>(
-  expandingGrid: ExpandingGrid<ValueType>,
-): ExpandingGrid<ValueType> =>
+export const deepCopyExpandingGrid = <ValueType>(expandingGrid: ExpandingGrid<ValueType>): ExpandingGrid<ValueType> =>
   Object.keys(expandingGrid).reduce(
     (newExpandingGrid, x) => ({
       ...newExpandingGrid,
@@ -67,10 +66,7 @@ export const deepCopyExpandingGrid = <ValueType>(
     {},
   );
 
-export const getNeighbourExpandingCoords = (
-  coords: Coords,
-  isDiagonal?: boolean,
-): Coords[] => {
+export const getNeighbourExpandingCoords = (coords: Coords, isDiagonal?: boolean): Coords[] => {
   const { x, y } = coords;
   const neighbours = [
     { x: x - 1, y },
@@ -79,57 +75,32 @@ export const getNeighbourExpandingCoords = (
     { x, y: y + 1 },
   ];
   if (isDiagonal) {
-    neighbours.push(
-      { x: x - 1, y: y - 1 },
-      { x: x - 1, y: y + 1 },
-      { x: x + 1, y: y - 1 },
-      { x: x + 1, y: y + 1 },
-    );
+    neighbours.push({ x: x - 1, y: y - 1 }, { x: x - 1, y: y + 1 }, { x: x + 1, y: y - 1 }, { x: x + 1, y: y + 1 });
   }
   return neighbours;
 };
 
-export const getExpandingDimensions = <ValueType>(
-  expandingGrid: ExpandingGrid<ValueType>,
-) => {
-  const minX = Object.keys(expandingGrid).reduce(
-    (min, x) => Math.min(min, +x),
-    0,
-  );
-  const maxX = Object.keys(expandingGrid).reduce(
-    (max, x) => Math.max(max, +x),
-    0,
-  );
+export const getExpandingDimensions = <ValueType>(expandingGrid: ExpandingGrid<ValueType>): Dimensions => {
+  const minX = Object.keys(expandingGrid).reduce((min, x) => Math.min(min, +x), 0);
+  const maxX = Object.keys(expandingGrid).reduce((max, x) => Math.max(max, +x), 0);
   const minY = Object.keys(expandingGrid).reduce((minGrid, x) => {
-    const minYRow = Object.keys(expandingGrid[+x]).reduce(
-      (min, y) => Math.min(min, +y),
-      0,
-    );
+    const minYRow = Object.keys(expandingGrid[+x]).reduce((min, y) => Math.min(min, +y), 0);
     return Math.min(minGrid, minYRow);
   }, 0);
   const maxY = Object.keys(expandingGrid).reduce((maxGrid, x) => {
-    const maxYRow = Object.keys(expandingGrid[+x]).reduce(
-      (max, y) => Math.max(max, +y),
-      0,
-    );
+    const maxYRow = Object.keys(expandingGrid[+x]).reduce((max, y) => Math.max(max, +y), 0);
     return Math.max(maxGrid, maxYRow);
   }, 0);
   return { minX, maxX, minY, maxY };
 };
 
-export const printExpandingGrid = <ValueType>(
-  expandingGrid: ExpandingGrid<ValueType>,
-): string => {
+export const printExpandingGrid = <ValueType>(expandingGrid: ExpandingGrid<ValueType>): string => {
   const { minX, maxX, minY, maxY } = getExpandingDimensions(expandingGrid);
   return range(minX, maxX + 1).reduce(
     (printValue, x) =>
       printValue +
       range(minY, maxY + 1)
-        .reduce(
-          (row, y) =>
-            row + (getValueExpandingGrid(expandingGrid, { x, y }) ?? ' ') + ' ',
-          '',
-        )
+        .reduce((row, y) => row + (getValueExpandingGrid(expandingGrid, { x, y }) ?? ' ') + ' ', '')
         .slice(0, -1) +
       '\n',
     '',
@@ -138,11 +109,7 @@ export const printExpandingGrid = <ValueType>(
 
 export const runFnOnExpandingGrid = <ValueType>(
   expandingGrid: ExpandingGrid<ValueType>,
-  fnToRun: (arg: {
-    coords: Coords;
-    grid: ExpandingGrid<ValueType>;
-    value: ValueType | undefined;
-  }) => ValueType | void,
+  fnToRun: (arg: { coords: Coords; grid: ExpandingGrid<ValueType>; value: ValueType | undefined }) => ValueType | void,
   noSet?: boolean,
 ) => {
   const { minX, maxX, minY, maxY } = getExpandingDimensions(expandingGrid);
@@ -160,20 +127,14 @@ export const runFnOnExpandingGrid = <ValueType>(
   });
 };
 
-export const countValueInGrid = <ValueType>(
-  expandingGrid: ExpandingGrid<ValueType>,
-  value: ValueType,
-): number => {
+export const countValueInGrid = <ValueType>(expandingGrid: ExpandingGrid<ValueType>, value: ValueType): number => {
   const { minX, maxX, minY, maxY } = getExpandingDimensions(expandingGrid);
 
   return range(minX, maxX + 1).reduce(
     (sumTotal, x) =>
       sumTotal +
       range(minY, maxY + 1).reduce(
-        (sumRow, y) =>
-          getValueExpandingGrid(expandingGrid, { x, y }) === value
-            ? sumRow + 1
-            : sumRow,
+        (sumRow, y) => (getValueExpandingGrid(expandingGrid, { x, y }) === value ? sumRow + 1 : sumRow),
         0,
       ),
     0,
